@@ -294,15 +294,32 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Create an empty set to stor the corners
+        corners_set = set()
+        # Iterate through each corner in the set of corners
+        for corner in self.corners:
+            corners_set.add(corner)
+        #  This checks if the starting position counts as a corner 
+        if self.startingPosition in self.corners: 
+            # If it is, remove it from the set of corners
+            corners_set.remove(self.startingPosition)
+        # Convert the set of remaining corners into a tuple
+        corners_tuple = tuple(corners_set)
+        # Return a tuple containing the starting position and the tuple of remaining corners
+        return(self.startingPosition, corners_tuple)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Take the tuple of the unvisited corners fron the given state
+        corners_tuple = state[1]
+        # Check if the length of the tuple is zero
+        if len(corners_tuple) == 0:
+            # If there are no unvisited corners, the goal is reached 
+            return True
+            # Else the goal hasnt been reached, return false
+        return False
 
     def getSuccessors(self, state):
         """
@@ -325,6 +342,17 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            next_x, next_y = int(x + dx), int(y + dy)
+            if not self.walls[next_x][next_y]:
+                nextState = (next_x, next_y)
+                cost = 1
+                corners_tuple = state[1]
+                corners_set = set(corners_tuple)
+                if nextState in self.corners and nextState in corners_set:
+                    corners_set.remove(nextState)
+                successors.append(((nextState, tuple(corners_set)), action, cost))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
